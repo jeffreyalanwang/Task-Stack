@@ -13,6 +13,9 @@
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
+            this._callProgramStateSave = null;
+            this._getUnsavedStateChanges = null;
+            this._setGlobalProgramState = null;
             this.backgroundWorker1.Dispose();
             if (disposing && (components != null))
             {

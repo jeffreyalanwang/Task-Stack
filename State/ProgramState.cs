@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 
 namespace Task_Stack.State
@@ -20,12 +21,13 @@ namespace Task_Stack.State
 
         #region Fields
         private List<TaskTree> _allTrees;
-        public List<TaskTree> AllTrees
+        // A read-only view on AllTrees.
+        public ICollection<TaskTree> AllTrees
         {
-            get => this._allTrees;
+            get => new ReadOnlyCollection<TaskTree>(this._allTrees);
         }
 
-        public bool UnsavedChanges { get; private set; }
+        public bool UnsavedChanges { get; private set; } = true;
         internal string SaveFile { get; private set; }
         #endregion Fields
         #region Constructors + Saving
@@ -35,6 +37,10 @@ namespace Task_Stack.State
             this._allTrees = new List<TaskTree>();
             this.SaveFile = GenerateDefaultSaveFilePath();
 
+            // Implement this.UnsavedChanges
+            this.OnDataChange(() => UnsavedChanges = true);
+
+            // Make sure we only have one instance per program instance
             Debug.Assert(ProgramState.Singleton == null);
             ProgramState.Singleton = this;
         }
@@ -113,6 +119,7 @@ namespace Task_Stack.State
             this.SaveFile = saveFile != null && saveFile.OriginalString.Length > 0
                             ? QualifyPath(saveFile)
                             : GenerateDefaultSaveFilePath();
+            this.UnsavedChanges = false;
         }
 
         // Save this ProgramState to a file path.
@@ -120,6 +127,7 @@ namespace Task_Stack.State
         public void Save()
         {
             string saveData = this.ToSaveData();
+            Console.WriteLine($"Writing ProgramState to absolute filepath: {this.SaveFile}");
             WriteStringToFile(str: saveData, absolutePath: this.SaveFile);
             this.UnsavedChanges = false;
         }
@@ -134,7 +142,17 @@ namespace Task_Stack.State
         public void RemoveTree(TaskTree tree)
         {
             this._allTrees.Remove(tree);
+            tree.Dispose();
             this.TriggerDataChange();
+        }
+
+        public void Dispose()
+        {
+            this.ClearChangeListeners();
+            foreach (TaskTree child in AllTrees)
+            {
+                child.Dispose();
+            }
         }
 
         public override string ToString()
@@ -181,6 +199,7 @@ namespace Task_Stack.State
 
             return true;
         }
+
         #endregion Public data methods
         #region Private helper methods
         private static readonly string defaultFileName = "taskstack_data.json";
@@ -241,15 +260,10 @@ namespace Task_Stack.State
     public class TaskTree : ChangeNotifier
     {
         #region Fields
-        private string _name;
         public string Name
         {
-            get => this._name;
-            set
-            {
-                _name = value;
-                this.TriggerDataChange();
-            }
+            get => this.RootTask.Name;
+            set { this.RootTask.Name = value; }
         }
         // Readonly so that we can be sure we only need to register this.DataChangeOccured() with the root task
         // RootTask can still be modified internally; only the object reference cannot be changed.
@@ -257,10 +271,9 @@ namespace Task_Stack.State
         #endregion Fields
         #region Constructors + Saving
         // Create a blank TaskTree.
-        // Set rootTask for default root task values.
-        public TaskTree(string name, Task rootTask)
+        // Shares a name with rootTask.
+        public TaskTree(Task rootTask)
         {
-            this._name = name;
             if (rootTask.Parent != null) throw new Exception("Root task must have null parent.");
             rootTask.OnDataChange(this.TriggerDataChange);
             this.RootTask = rootTask;
@@ -268,7 +281,7 @@ namespace Task_Stack.State
 
         // From save data.
         private static readonly ImmutableHashSet<string> saveDataFields =
-            ImmutableHashSet.Create("type", "name", "root_task");
+            ImmutableHashSet.Create("type", "root_task");
         private static bool CheckDataFields(Dictionary<string, string> dict) // should return True if valid Dictionary
         {
             // check value of "type"
@@ -300,11 +313,8 @@ namespace Task_Stack.State
                 throw new Exception("Not a valid serialized TaskTree string:" + dict.ToString());
             }
 
-            // build this Task
-            this._name = dict["name"];
-
             // build root node
-            Task rootTask = new Task(dict["root_task"]);
+            Task rootTask = new Task(saveData: dict["root_task"]);
             rootTask.OnDataChange(this.TriggerDataChange);
             this.RootTask = rootTask;
         }
@@ -314,7 +324,6 @@ namespace Task_Stack.State
             // define dict schema + save this task's metadata
             Dictionary<string, string> dict = new Dictionary<string, string>();
             dict.Add("type", "TaskTree");
-            dict.Add("name", this._name);
             dict.Add("root_task", this.RootTask.ToSaveData());
 
             // verify we did this right
@@ -349,6 +358,12 @@ namespace Task_Stack.State
             result += $"Tree name: {this.Name}";
 
             return result;
+        }
+
+        public void Dispose()
+        {
+            this.ClearChangeListeners();
+            this.RootTask.Dispose();
         }
         #endregion Public data methods
     }
@@ -386,15 +401,15 @@ namespace Task_Stack.State
                 switch (value)
                 {
                     // When marking a task as done, mark its children done as well
-                    case true:
+                    case (true):
                         this._children.ForEach(
                             // Will propogate recursively
                             (childTask) => { childTask.Done = true; }
                         );
                         break;
                     // When marking a task as not done again, mark its parents not done as well
-                    case false:
-                        this._parent.Done = true;
+                    case (false):
+                        if (!this.IsRootNode) this._parent.Done = true;
                         break;
                 }
                 this.TriggerDataChange();
@@ -441,13 +456,13 @@ namespace Task_Stack.State
         {
             get
             {
-                return this._parent != null;
+                return this._parent == null;
             }
         }
         #endregion UI metadata
         #region Constructors + saving
         // Create a new blank Task.
-        internal Task(string name, string description, bool done, Task parentTask = null)
+        internal Task(string name, string description = "", bool done = false, Task parentTask = null)
         {
             this._name = name;
             this._description = description;
@@ -536,7 +551,7 @@ namespace Task_Stack.State
         #region Public data methods
 
         // Add a child node
-        // The parent of childTask (i.e. this Task) calls its DataChangeOccured() in its addChild().
+        // The parent of childTask (i.e. this Task) calls its DataChangeOccured() in its createChild().
         //  - notifyChangeListeners
         public void AddChild(Task childTask, bool notifyChangeListeners = true)
         {
@@ -566,8 +581,7 @@ namespace Task_Stack.State
             // line above should imply line below
             // this._parent.TriggerDataChange();
 
-            // No more change listeners for this task
-            this.ClearChangeListeners();
+            this.Dispose();
         }
 
         // Call on root node only.
@@ -709,6 +723,15 @@ namespace Task_Stack.State
                 (string line) => line.Length == allMergedLines.Last().Length
             ));
             return string.Join( Environment.NewLine, allMergedLines );
+        }
+
+        public void Dispose()
+        {
+            this.ClearChangeListeners();
+            foreach (Task child in this._children)
+            {
+                child.Dispose();
+            }
         }
         #endregion Public data methods
     }

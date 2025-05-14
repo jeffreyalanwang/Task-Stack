@@ -26,6 +26,11 @@ namespace Task_Stack.State
             this.dataChangeCallbacks.ForEach((callback) => callback());
         }
 
+        public void removeChangeListener(DataChangeReaction callback)
+        {
+            this.dataChangeCallbacks.Remove(callback);
+        }
+
         protected void ClearChangeListeners() => this.dataChangeCallbacks.Clear();
     }
 }

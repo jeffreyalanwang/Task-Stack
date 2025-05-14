@@ -24,11 +24,7 @@ namespace Task_Stack.GUI
         #region Fields + constructor
         private Func<bool> _getUnsavedStateChanges = null;
         private Action _callProgramStateSave = null;
-        public SetState _setGlobalProgramState
-        {
-            private get;
-            set;
-        }
+        private SetState _setGlobalProgramState;
 
         // Used by SaveLoadControl to change the program's global state when "Load" function is used.
         public delegate void SetState(ProgramState newState);
@@ -43,6 +39,11 @@ namespace Task_Stack.GUI
             this._canLoad = ProgramState.LoadFileAvailable();
             this._canCreate = true;
         }
+        // Call immediately after constructor.
+        public void InitializeToState(SetState setGlobalProgramState)
+        {
+            this._setGlobalProgramState = setGlobalProgramState;
+        }
         #endregion Fields + constructor
 
         #region backgroundWorker1 boilerplate
@@ -55,7 +56,7 @@ namespace Task_Stack.GUI
         }
 
         private List<DoWorkEventHandler> backgroundWorker1_registeredTasks = new List<DoWorkEventHandler>();
-        private List<Action> backgroundWorker1_onCompleted_registeredTasks = new List<Action>();
+        private List<RunWorkerCompletedEventHandler> backgroundWorker1_onCompleted_registeredTasks = new List<RunWorkerCompletedEventHandler>();
         void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             // Clear tasks for background worker
@@ -64,21 +65,23 @@ namespace Task_Stack.GUI
                 backgroundWorker1.DoWork -= backgroundWorker1_registeredTasks[i];
                 backgroundWorker1_registeredTasks.RemoveAt(i);
             }
-            // Run all requested onCompleted tasks
-            for (int i = 0; i < backgroundWorker1_onCompleted_registeredTasks.Count; i++)
-            {
-                Action task = backgroundWorker1_onCompleted_registeredTasks[i];
-                task.Invoke();
-                backgroundWorker1_onCompleted_registeredTasks.RemoveAt(i);
-            }
-            // Reset cursor
-            Cursor.Current = Cursors.Default;
 
             // Did our thread throw an error?
             if (e.Error != null)
             {
                 MessageBox.Show($"Error: {e.Error.ToString()}");
             }
+
+            // Run all requested onCompleted tasks
+            for (int i = 0; i < backgroundWorker1_onCompleted_registeredTasks.Count; i++)
+            {
+                RunWorkerCompletedEventHandler task = backgroundWorker1_onCompleted_registeredTasks[i];
+                task(sender, e);
+                backgroundWorker1_onCompleted_registeredTasks.RemoveAt(i);
+            }
+
+            // Reset cursor
+            Cursor.Current = Cursors.Default;
         }
         #endregion backgroundWorker1 boilerplate
 
@@ -96,17 +99,18 @@ namespace Task_Stack.GUI
             // Run background task in another thread
 
             // Prepare background task: call createState()
-            DoWorkEventHandler backgroundTask = (object _, DoWorkEventArgs __) => createState();
-            backgroundWorker1_registeredTasks.Add(backgroundTask);
-            backgroundWorker1.DoWork += backgroundTask;
+            backgroundWorker1_registeredTasks.Add(createState);
+            backgroundWorker1.DoWork += createState;
 
             // Prepare handler that runs on completion
-            Action onCompletedTask = () =>
+            RunWorkerCompletedEventHandler onCompletedTask = (object _sender, RunWorkerCompletedEventArgs _e) =>
             {
                 // Change UI buttons
                 this._needsSave = true;
                 this._canCreate = false;
                 this._canLoad = false;
+                // Update the global program state with the newly-created state
+                this._setGlobalProgramState((ProgramState)_e.Result);
             };
             Debug.Assert(this.backgroundWorker1_onCompleted_registeredTasks.Count == 0);
             backgroundWorker1_onCompleted_registeredTasks.Add(onCompletedTask);
@@ -127,17 +131,18 @@ namespace Task_Stack.GUI
             // Run background task in another thread
 
             // Prepare background task: call loadState()
-            DoWorkEventHandler backgroundTask = (object _, DoWorkEventArgs __) => loadState();
-            backgroundWorker1_registeredTasks.Add(backgroundTask);
-            backgroundWorker1.DoWork += backgroundTask;
+            backgroundWorker1_registeredTasks.Add(loadState);
+            backgroundWorker1.DoWork += loadState;
 
             // Prepare handler that runs on completion
-            Action onCompletedTask = () =>
+            RunWorkerCompletedEventHandler onCompletedTask = (object _sender, RunWorkerCompletedEventArgs _e) =>
             {
                 // Change UI buttons
                 this._needsSave = false;
                 this._canCreate = false;
                 this._canLoad = false;
+                // Update the global program state with the newly-created state
+                this._setGlobalProgramState((ProgramState)_e.Result);
             };
             Debug.Assert(this.backgroundWorker1_onCompleted_registeredTasks.Count == 0);
             backgroundWorker1_onCompleted_registeredTasks.Add(onCompletedTask);
@@ -158,12 +163,11 @@ namespace Task_Stack.GUI
             // Run background task in another thread
 
             // Prepare background task: call saveState()
-            DoWorkEventHandler backgroundTask = (object _, DoWorkEventArgs __) => saveState();
-            backgroundWorker1_registeredTasks.Add(backgroundTask);
-            backgroundWorker1.DoWork += backgroundTask;
+            backgroundWorker1_registeredTasks.Add(saveState);
+            backgroundWorker1.DoWork += saveState;
 
             // Prepare handler that runs on completion
-            Action onCompletedTask = () =>
+            RunWorkerCompletedEventHandler onCompletedTask = (object _sender, RunWorkerCompletedEventArgs _e) =>
             {
                 // Change UI buttons
                 this._needsSave = false;
@@ -178,55 +182,50 @@ namespace Task_Stack.GUI
         }
         #endregion UI handlers
         #region State change handlers
-        internal void OnStateChanged()
+        public void OnStateChanged()
         {
             // if unsaved changes (state.UnsavedChanges), change UI to reflect unsaved changes (_needsSave)
             this._needsSave = this._getUnsavedStateChanges();
         }
         #endregion State change handlers
 
-        private void saveState()
+        private void saveState(object sender, DoWorkEventArgs e)
         {
             _callProgramStateSave();
-            this._needsSave = false;
+            e.Result = true;
         }
-        private void createState()
+        private void createState(object sender, DoWorkEventArgs e)
         {
             // Create a blank new ProgramState
-            ProgramState newState = new ProgramState();
-            // Call _setGlobalProgramState
-            this._setGlobalProgramState(newState);
-            
+            ProgramState newState = new ProgramState();            
             // Register as a listener for the state
             newState.OnDataChange(this.OnStateChanged);
-            // Set _callProgramStateSave
+            // Set _callProgramStateSave, _getUnsavedStateChanges
             this._callProgramStateSave = newState.Save;
+            this._getUnsavedStateChanges = () => newState.UnsavedChanges;
+            // Pass the new ProgramState on to do a few UI operations/pass it on to the parent Control
+            e.Result = newState;
         }
         // Load a ProgramState from default save file location
-        private void loadState()
+        private void loadState(object sender, DoWorkEventArgs e)
         {
-            // Load a new ProgramState from default location
-            ProgramState loadedState = new ProgramState((Uri)null);
-            // Call _setGlobalProgramState
-            this._setGlobalProgramState(loadedState);
-
-            // Register as a listener for the state
-            loadedState.OnDataChange(this.OnStateChanged);
-            // Set _callProgramStateSave
-            this._callProgramStateSave = loadedState.Save;
+            // Load a new ProgramState from given filePath or default location (null)
+            ProgramState loadedState = this.loadState((Uri)e.Argument);
+            // Pass the new ProgramState on to do a few UI operations/pass it on to the parent Control
+            e.Result = loadedState;
         }
         // Load a new ProgramState from given filePath
-        private void loadState(Uri filePath)
+        private ProgramState loadState(Uri filePath)
         {
             // Load a new ProgramState from given filePath
             ProgramState loadedState = new ProgramState(filePath);
-            // Call _setGlobalProgramState
-            this._setGlobalProgramState(loadedState);
-
             // Register as a listener for the state
             loadedState.OnDataChange(this.OnStateChanged);
-            // Set _callProgramStateSave
+            // Set _callProgramStateSave, _getUnsavedStateChanges
             this._callProgramStateSave = loadedState.Save;
+            this._getUnsavedStateChanges = () => loadedState.UnsavedChanges;
+            // Pass the new ProgramState on to do a few UI operations/pass it on to the parent Control
+            return loadedState;
         }
 
         // Saving is disabled on program start (but should not be if a program state is instantiated automatically at program start)
@@ -254,16 +253,10 @@ namespace Task_Stack.GUI
         {
             set
             {
-                if (value == true)
-                {
-                    this._canSave = true;
-                    this.ModificationIndicator.Visible = true;
-                }
-                else
-                {
-                    this._canSave = false;
-                    this.ModificationIndicator.Visible = false;
-                }
+                Debug.Assert(this.Visible);
+                // Debug.Print($"SaveLoadControl._needsSave set to {value}."); // Debug
+                this._canSave = value;
+                this.ModificationIndicator.Visible = value;
             }
         }
     }

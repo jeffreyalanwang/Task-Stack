@@ -65,11 +65,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GUI\AllTreesControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\AllTreesControl.Designer.cs">
+      <DependentUpon>AllTreesControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\SaveLoadControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="GUI\SaveLoadControl.Designer.cs">
       <DependentUpon>SaveLoadControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\TaskControl.cs" />
+    <Compile Include="GUI\TaskTreeControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GUI\TaskTreeControl.Designer.cs">
+      <DependentUpon>TaskTreeControl.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\Window.cs">
       <SubType>Form</SubType>
@@ -82,8 +95,14 @@
     <Compile Include="State\State_Serialization.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="GUI\AllTreesControl.resx">
+      <DependentUpon>AllTreesControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\SaveLoadControl.resx">
       <DependentUpon>SaveLoadControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\TaskTreeControl.resx">
+      <DependentUpon>TaskTreeControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\Window.resx">
       <DependentUpon>Window.cs</DependentUpon>

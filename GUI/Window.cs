@@ -18,14 +18,26 @@ namespace Task_Stack.GUI
         public Window()
         {
             InitializeComponent();
-            saveLoadControl1._setGlobalProgramState = this.applyProgramState;
+            saveLoadControl.InitializeToState(this.applyProgramState);
         }
 
-        internal void applyProgramState(ProgramState newState)
+        private void applyProgramState(ProgramState newState)
         {
             this._globalData = newState;
-            this.BeginMessageControl.Visible = false;
-            this.AllTreesControl.Visible = true;
+
+            this.newAllTreesControl();
+            this.allTreesControl.InitializeToState(
+                initialTrees: newState.AllTrees,
+                addDelegate: (tree) => newState.AddTree(tree, notifyChangeListeners: true),
+                removeDelegate: (tree) => newState.RemoveTree(tree)
+            );
+
+            // UI changes
+            if (this.beginMessageControl.Visible)
+            {
+                this.beginMessageControl.Visible = false;
+            }
+            this.allTreesControl.Visible = true;
         }
     }
 }

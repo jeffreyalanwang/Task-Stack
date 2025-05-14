@@ -16,7 +16,9 @@ namespace Task_Stack
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GUI.Window());
+
+            Form mainForm = new GUI.Window();
+            Application.Run(mainForm);
         }
     }
 }
