@@ -20,7 +20,7 @@ namespace Task_Stack.GUI
             get => this.__state;
             set
             {
-                this.TreeView.BeginUpdate();
+                if (this.TreeView != null) this.TreeView.BeginUpdate();
 
                 if (this.__state != null)
                 {
@@ -36,7 +36,7 @@ namespace Task_Stack.GUI
                 this.TaskDescription = value.Description;
                 this.TaskDone = value.Done;
 
-                this.TreeView.EndUpdate();
+                if (this.TreeView != null) this.TreeView.EndUpdate();
             }
         }
         public new string Text { get => base.Text; }
@@ -49,7 +49,7 @@ namespace Task_Stack.GUI
                                 ? strikethrough(value)
                                 : value;
                 this._state.Name = value;
-                this.TreeView.Invalidate();
+                if (this.TreeView != null) this.TreeView.Invalidate();
             }
         }
         public new string ToolTipText { get => base.ToolTipText; }
@@ -60,7 +60,7 @@ namespace Task_Stack.GUI
             {
                 base.ToolTipText = value;
                 this._state.Description = value;
-                this.TreeView.Invalidate();
+                if (this.TreeView != null) this.TreeView.Invalidate();
             }
         }
         public bool TaskDone
@@ -96,7 +96,7 @@ namespace Task_Stack.GUI
                                 ? strikethrough(this.TaskName)
                                 : this.TaskName;
                 this._state.Done = value;
-                this.TreeView.Invalidate();
+                if (this.TreeView != null) this.TreeView.Invalidate();
             }
         }
 
@@ -123,7 +123,7 @@ namespace Task_Stack.GUI
         // Occurs in state and in UI
         public void createChild()
         {
-            State.Task newTask = new State.Task("Name");
+            State.Task newTask = new State.Task(name: "Name");
             // Add the child_state state to this state
             this._state.AddChild(newTask);
             // Add the child to the UI

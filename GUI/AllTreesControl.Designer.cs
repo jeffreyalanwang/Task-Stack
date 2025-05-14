@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using Task_Stack.State;
+using Windows.UI;
 
 namespace Task_Stack.GUI
 {
@@ -38,8 +39,8 @@ namespace Task_Stack.GUI
             this.defaultTabPage = new System.Windows.Forms.TabPage();
             this.StartInstructions = new System.Windows.Forms.Label();
             this.tabControl = new System.Windows.Forms.TabControl();
-            this.DellCurrButton = new System.Windows.Forms.Button();
-            this.AddNewButton = new System.Windows.Forms.Button();
+            this.delCurrButton = new System.Windows.Forms.Button();
+            this.addNewButton = new System.Windows.Forms.Button();
             this.defaultTabPage.SuspendLayout();
             this.tabControl.SuspendLayout();
             this.SuspendLayout();
@@ -49,9 +50,8 @@ namespace Task_Stack.GUI
             this.defaultTabPage.Controls.Add(this.StartInstructions);
             this.defaultTabPage.Location = new System.Drawing.Point(8, 8);
             this.defaultTabPage.Name = "defaultTabPage";
-            this.defaultTabPage.Margin = new System.Windows.Forms.Padding(3);
             this.defaultTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.defaultTabPage.Size = new System.Drawing.Size(1088, 764);
+            this.defaultTabPage.Size = new System.Drawing.Size(1084, 729);
             this.defaultTabPage.TabIndex = 0;
             this.defaultTabPage.Text = "[empty]";
             this.defaultTabPage.UseVisualStyleBackColor = true;
@@ -61,7 +61,7 @@ namespace Task_Stack.GUI
             this.StartInstructions.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.StartInstructions.AutoSize = true;
             this.StartInstructions.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.StartInstructions.Location = new System.Drawing.Point(296, 286);
+            this.StartInstructions.Location = new System.Drawing.Point(296, 257);
             this.StartInstructions.Name = "StartInstructions";
             this.StartInstructions.Size = new System.Drawing.Size(490, 183);
             this.StartInstructions.TabIndex = 0;
@@ -72,51 +72,58 @@ namespace Task_Stack.GUI
             // 
             this.tabControl.Alignment = System.Windows.Forms.TabAlignment.Bottom;
             this.tabControl.Controls.Add(this.defaultTabPage);
+            this.tabControl.Anchor = System.Windows.Forms.AnchorStyles.Top |
+                                        System.Windows.Forms.AnchorStyles.Bottom |
+                                        System.Windows.Forms.AnchorStyles.Left |
+                                        System.Windows.Forms.AnchorStyles.Right;
             this.tabControl.Location = new System.Drawing.Point(0, 0);
             this.tabControl.Multiline = true;
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(1100, 774);
+            this.tabControl.Size = new System.Drawing.Size(1108, 776);
             this.tabControl.TabIndex = 0;
             // 
-            // DellCurrButton
+            // delCurrButton
             // 
-            this.DellCurrButton.Enabled = false;
-            this.DellCurrButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DellCurrButton.Location = new System.Drawing.Point(900, 736);
-            this.DellCurrButton.Name = "DellCurrButton";
-            this.DellCurrButton.Size = new System.Drawing.Size(92, 40);
-            this.DellCurrButton.TabIndex = 1;
-            this.DellCurrButton.Text = "Delete";
-            this.DellCurrButton.UseVisualStyleBackColor = true;
-            this.DellCurrButton.Click += new System.EventHandler(this.DellCurrButton_Click);
+            this.delCurrButton.Enabled = false;
+            this.delCurrButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.delCurrButton.Location = new System.Drawing.Point(900, 737);
+            this.delCurrButton.Name = "DelCurrButton";
+            this.delCurrButton.Size = new System.Drawing.Size(92, 40);
+            this.delCurrButton.TabStop = true;
+            this.delCurrButton.TabIndex = 1;
+            this.delCurrButton.Text = "Delete";
+            this.delCurrButton.UseVisualStyleBackColor = true;
+            this.delCurrButton.Click += new System.EventHandler(this.DellCurrButton_Click);
+            this.delCurrButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             // 
-            // AddNewButton
+            // addNewButton
             // 
-            this.AddNewButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AddNewButton.Location = new System.Drawing.Point(998, 736);
-            this.AddNewButton.Name = "AddNewButton";
-            this.AddNewButton.Size = new System.Drawing.Size(92, 40);
-            this.AddNewButton.TabIndex = 2;
-            this.AddNewButton.Text = "New";
-            this.AddNewButton.UseVisualStyleBackColor = true;
-            this.AddNewButton.Click += new System.EventHandler(this.AddNewButton_Click);
+            this.addNewButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addNewButton.Location = new System.Drawing.Point(998, 737);
+            this.addNewButton.Name = "AddNewButton";
+            this.addNewButton.Size = new System.Drawing.Size(92, 40);
+            this.addNewButton.TabIndex = 1;
+            this.addNewButton.Text = "New";
+            this.addNewButton.TabStop = true;
+            this.addNewButton.UseVisualStyleBackColor = true;
+            this.addNewButton.Click += new System.EventHandler(this.AddNewButton_Click);
+            this.addNewButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             // 
             // AllTreesControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.AddNewButton);
-            this.Controls.Add(this.DellCurrButton);
+            this.Controls.Add(this.delCurrButton);
+            this.Controls.Add(this.addNewButton);
             this.Controls.Add(this.tabControl);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "AllTreesControl";
-            this.Size = new System.Drawing.Size(1100, 776);
+            this.Size = new System.Drawing.Size(1102, 876);
             this.defaultTabPage.ResumeLayout(false);
             this.defaultTabPage.PerformLayout();
             this.tabControl.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
 
         #endregion
@@ -139,8 +146,9 @@ namespace Task_Stack.GUI
             taskTreeControl.Location = new System.Drawing.Point(3, 3);
             taskTreeControl.Padding = new System.Windows.Forms.Padding(0);
             taskTreeControl.Margin = new System.Windows.Forms.Padding(0);
-            taskTreeControl.Size = new System.Drawing.Size(1082, 758);
+            taskTreeControl.Size = new System.Drawing.Size(1078, 723);
             taskTreeControl.Name = $"TaskTreeControl{this._taskTreesCreated}";
+            taskTreeControl.Dock = DockStyle.Fill;
             taskTreeControl.InitializeToState(tree, setTabName); // Give taskTreeControl its contents
             taskTreeControl.ResumeLayout(false);
 
@@ -148,8 +156,8 @@ namespace Task_Stack.GUI
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.defaultTabPage.Location = new System.Drawing.Point(8, 8);
             tabPage.Margin = new System.Windows.Forms.Padding(3);
-            tabPage.Padding = new System.Windows.Forms.Padding(3);
-            tabPage.Size = new System.Drawing.Size(1088, 764);
+            tabPage.Padding = new System.Windows.Forms.Padding(3, 3, 3, 9);
+            tabPage.Size = new System.Drawing.Size(1084, 729);
             tabPage.Name = $"taskTreeTabPage{this._taskTreesCreated}";
             tabPage.UseVisualStyleBackColor = true;
             setTabName.Invoke(tree.Name);
@@ -190,8 +198,8 @@ namespace Task_Stack.GUI
 
         private System.Windows.Forms.TabPage defaultTabPage;
         private System.Windows.Forms.TabControl tabControl;
-        private System.Windows.Forms.Button DellCurrButton;
-        private System.Windows.Forms.Button AddNewButton;
+        private System.Windows.Forms.Button delCurrButton;
+        private System.Windows.Forms.Button addNewButton;
         private System.Windows.Forms.Label StartInstructions;
         private readonly List<TabPage> taskTreeTabPages = new List<TabPage>();
     }

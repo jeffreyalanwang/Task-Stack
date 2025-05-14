@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 
 namespace Task_Stack.State
@@ -96,7 +95,7 @@ namespace Task_Stack.State
             // define dict schema + save this task's metadata
             Dictionary<string, string> dict = new Dictionary<string, string>();
             dict.Add("type", "ProgramState");
-            dict.Add("version", ConfigurationManager.AppSettings["appVersion"]);
+            dict.Add("version", Program.Config["AppVersion"]);
             dict.Add("task_trees", null);
 
             // add task trees
@@ -409,7 +408,7 @@ namespace Task_Stack.State
                         break;
                     // When marking a task as not done again, mark its parents not done as well
                     case (false):
-                        if (!this.IsRootNode) this._parent.Done = true;
+                        if (!this.IsRootNode) this._parent.Done = false;
                         break;
                 }
                 this.TriggerDataChange();

@@ -41,7 +41,7 @@
             // 
             // NewButton
             // 
-            this.NewButton.Location = new System.Drawing.Point(35, 25);
+            this.NewButton.Location = new System.Drawing.Point(55, 4);
             this.NewButton.Name = "NewButton";
             this.NewButton.Size = new System.Drawing.Size(101, 92);
             this.NewButton.TabIndex = 0;
@@ -52,7 +52,7 @@
             // SaveButton
             // 
             this.SaveButton.Enabled = false;
-            this.SaveButton.Location = new System.Drawing.Point(274, 25);
+            this.SaveButton.Location = new System.Drawing.Point(294, 4);
             this.SaveButton.Name = "SaveButton";
             this.SaveButton.Size = new System.Drawing.Size(210, 92);
             this.SaveButton.TabIndex = 1;
@@ -62,7 +62,7 @@
             // 
             // LoadButton
             // 
-            this.LoadButton.Location = new System.Drawing.Point(142, 25);
+            this.LoadButton.Location = new System.Drawing.Point(162, 4);
             this.LoadButton.Name = "LoadButton";
             this.LoadButton.Size = new System.Drawing.Size(101, 92);
             this.LoadButton.TabIndex = 2;
@@ -73,9 +73,9 @@
             // ModificationIndicator
             // 
             this.ModificationIndicator.AutoSize = true;
-            this.ModificationIndicator.Location = new System.Drawing.Point(521, 59);
+            this.ModificationIndicator.Location = new System.Drawing.Point(541, 37);
             this.ModificationIndicator.Name = "ModificationIndicator";
-            this.ModificationIndicator.Size = new System.Drawing.Size(204, 50);
+            this.ModificationIndicator.Size = new System.Drawing.Size(102, 25);
             this.ModificationIndicator.TabIndex = 3;
             this.ModificationIndicator.Text = "*Modified";
             this.ModificationIndicator.Visible = false;
@@ -89,7 +89,7 @@
             this.Controls.Add(this.SaveButton);
             this.Controls.Add(this.NewButton);
             this.Name = "SaveLoadControl";
-            this.Size = new System.Drawing.Size(787, 150);
+            this.Size = new System.Drawing.Size(750, 100);
             this.ResumeLayout(false);
             this.PerformLayout();
 

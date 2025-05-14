@@ -34,14 +34,17 @@ namespace Task_Stack.GUI
         {
             this.beginMessageControl = new System.Windows.Forms.Label();
             this.saveLoadControl = new Task_Stack.GUI.SaveLoadControl();
+            this.GlobalBar = new System.Windows.Forms.Panel();
+            this.GlobalBar.SuspendLayout();
             this.SuspendLayout();
             // 
             // beginMessageControl
             // 
             this.beginMessageControl.AutoSize = true;
+            this.beginMessageControl.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.beginMessageControl.BackColor = System.Drawing.Color.Transparent;
             this.beginMessageControl.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.beginMessageControl.Location = new System.Drawing.Point(380, 338);
+            this.beginMessageControl.Location = new System.Drawing.Point(380, 268);
             this.beginMessageControl.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.beginMessageControl.Name = "beginMessageControl";
             this.beginMessageControl.Size = new System.Drawing.Size(340, 255);
@@ -51,23 +54,36 @@ namespace Task_Stack.GUI
             // 
             // saveLoadControl
             // 
-            this.saveLoadControl.Location = new System.Drawing.Point(0, 782);
-            this.saveLoadControl.Margin = new System.Windows.Forms.Padding(0);
+            this.saveLoadControl.Location = new System.Drawing.Point(156, 0);
+            this.saveLoadControl.Margin = new System.Windows.Forms.Padding(156, 0, 156, 0);
             this.saveLoadControl.Name = "saveLoadControl";
-            this.saveLoadControl.Size = new System.Drawing.Size(788, 150);
+            this.saveLoadControl.Size = new System.Drawing.Size(788, 100);
             this.saveLoadControl.TabIndex = 1;
+            // 
+            // GlobalBar
+            // 
+            this.GlobalBar.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.GlobalBar.BackColor = System.Drawing.Color.Transparent;
+            this.GlobalBar.Controls.Add(this.saveLoadControl);
+            this.GlobalBar.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.GlobalBar.Location = new System.Drawing.Point(0, 778);
+            this.GlobalBar.Margin = new System.Windows.Forms.Padding(0);
+            this.GlobalBar.Name = "GlobalBar";
+            this.GlobalBar.Size = new System.Drawing.Size(1100, 100);
+            this.GlobalBar.TabIndex = 1;
             // 
             // Window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1100, 930);
+            this.ClientSize = new System.Drawing.Size(1100, 880);
             this.Controls.Add(this.beginMessageControl);
-            this.Controls.Add(this.saveLoadControl);
+            this.Controls.Add(this.GlobalBar);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "Window";
-            this.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
+            this.Padding = new System.Windows.Forms.Padding(0, 0, 0, 2);
             this.Text = "Task Stack";
+            this.GlobalBar.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -83,11 +99,11 @@ namespace Task_Stack.GUI
             this.allTreesControl.BackColor = System.Drawing.Color.Transparent;
             this.allTreesControl.Location = new System.Drawing.Point(0, 0);
             this.allTreesControl.Name = "allTreesControl";
-            this.allTreesControl.Size = new System.Drawing.Size(1100, 776);
+            this.allTreesControl.Size = new System.Drawing.Size(1102, 876);
             this.allTreesControl.TabStop = true;
             this.allTreesControl.TabIndex = 0;
-            this.allTreesControl.Margin = new System.Windows.Forms.Padding(0);
-            
+            this.allTreesControl.Dock = System.Windows.Forms.DockStyle.Fill;
+
             // Add to layout at specific location
             this.Controls.Add(this.allTreesControl);
 
@@ -98,5 +114,6 @@ namespace Task_Stack.GUI
         private System.Windows.Forms.Label beginMessageControl;
         private AllTreesControl allTreesControl;
         private SaveLoadControl saveLoadControl;
+        private System.Windows.Forms.Panel GlobalBar;
     }
 }

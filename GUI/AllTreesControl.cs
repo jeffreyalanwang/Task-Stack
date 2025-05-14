@@ -82,7 +82,7 @@ namespace Task_Stack.GUI
         {
             set
             {
-                this.DellCurrButton.Enabled = value;
+                this.delCurrButton.Enabled = value;
             }
         }
 

@@ -20,6 +20,7 @@ namespace Task_Stack.GUI
         private TaskTree _state
         {
             get => this.__state;
+            /// Requires this.treeView.Nodes to already be populated (at least the root node).
             set
             {
                 // Deregister previous value's callbacks
@@ -36,6 +37,7 @@ namespace Task_Stack.GUI
                 value.OnDataChange(_stateBoundValuesCallback);
                 // Set value
                 this.__state = value;
+                this.focusedTaskControl = (TaskControl)this.treeView.Nodes[0];
             }
         }
         public TaskTree Tree
@@ -50,20 +52,27 @@ namespace Task_Stack.GUI
             set
             {
                 if (value == this._focusedTaskControl) return;
-                bool anyTaskIsSelected = value == null;
+                this._focusedTaskControl = value; // Must happen before the event-triggering statements below
+                bool anyTaskIsSelected = value != null;
                 // display/hide fields
-                this.taskNameBox.Visible = anyTaskIsSelected;
-                this.taskDescriptionBox.Visible = anyTaskIsSelected;
-                this.doneCheckBox.Visible = anyTaskIsSelected;
+                this.taskNameBox.Enabled = anyTaskIsSelected;
+                this.taskDescriptionBox.Enabled = anyTaskIsSelected;
+                this.doneCheckBox.Enabled = anyTaskIsSelected;
                 if (anyTaskIsSelected)
                 {
                     this.taskNameBox.Text = value.TaskName;
                     this.taskDescriptionBox.Text = value.TaskDescription;
                     this.doneCheckBox.Checked = value.TaskDone;
                 }
+                else
+                {
+                    this.taskNameBox.Text = String.Empty;
+                    this.taskDescriptionBox.Text = String.Empty;
+                    this.doneCheckBox.Checked = false;
+                }
                 // enable/disable buttons
                 this.addChildTaskButton.Enabled = anyTaskIsSelected;
-                this.deleteTaskButton.Enabled = anyTaskIsSelected;
+                this.deleteTaskButton.Enabled = anyTaskIsSelected && (value.Parent != null);
             }
         }
 
@@ -72,8 +81,8 @@ namespace Task_Stack.GUI
             InitializeComponent();
 
             // Stay updated to new treeNode selections.
-            this.treeView.NodeMouseClick += new TreeNodeMouseClickEventHandler(handleTreeViewInteraction);
-            this.treeView.KeyDown += new KeyEventHandler(handleTreeViewInteraction);
+            this.treeView.NodeMouseClick += new TreeNodeMouseClickEventHandler(this.handleTreeViewClick);
+            this.treeView.KeyUp += new KeyEventHandler((sender, e) => this.handleTreeViewSelection(this.treeView.SelectedNode));
 
             // Change color for placeholder text values.
             taskNameBox.TextChanged += new EventHandler(handleInputTextColor);
@@ -87,8 +96,6 @@ namespace Task_Stack.GUI
         // Call immediately after constructor.
         public void InitializeToState(TaskTree tree, Action<string> setTabName)
         {
-            this._state = tree;
-
             // Add the root node, then do the rest via recursion inside init of TaskControl 
             treeView.BeginUpdate();
 
@@ -97,12 +104,19 @@ namespace Task_Stack.GUI
             rootNode.InitializeToState(tree.RootTask);
 
             treeView.EndUpdate();
+
+            this._state = tree;
             this.setTabName = setTabName;
         }
-
-        private void handleTreeViewInteraction(object sender, EventArgs e)
+        // Mouse events, even [OnMouseUp], are too early to use [treeView.SelectedNode], so we must use TreeNodeMouseClick event.
+        private void handleTreeViewClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            TreeNode selectedNode = this.treeView.SelectedNode;
+            TreeNode clickedNode = e.Node;
+            this.handleTreeViewSelection(clickedNode);
+        }
+        // selectedNode is whatever was just selected (but it doesn't have to be this.treeView.SelectedNode quite yet)
+        private void handleTreeViewSelection(TreeNode selectedNode)
+        {
             TaskControl selectedTaskNode = (TaskControl)selectedNode;
             this.focusedTaskControl = selectedTaskNode;
         }
