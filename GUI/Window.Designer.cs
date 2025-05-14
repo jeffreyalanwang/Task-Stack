@@ -34,9 +34,6 @@ namespace Task_Stack.GUI
         {
             this.beginMessageControl = new System.Windows.Forms.Label();
             this.saveLoadControl = new Task_Stack.GUI.SaveLoadControl();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.AllTasksPlaceholder = new System.Windows.Forms.Panel();
-            this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // beginMessageControl
@@ -60,36 +57,17 @@ namespace Task_Stack.GUI
             this.saveLoadControl.Size = new System.Drawing.Size(788, 150);
             this.saveLoadControl.TabIndex = 1;
             // 
-            // flowLayoutPanel1
-            // 
-            this.flowLayoutPanel1.Controls.Add(this.AllTasksPlaceholder);
-            this.flowLayoutPanel1.Controls.Add(this.saveLoadControl);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(1100, 926);
-            this.flowLayoutPanel1.TabIndex = 1;
-            // 
-            // AllTasksPlaceholder
-            // 
-            this.AllTasksPlaceholder.BackColor = System.Drawing.Color.Transparent;
-            this.AllTasksPlaceholder.Location = new System.Drawing.Point(3, 3);
-            this.AllTasksPlaceholder.Name = "AllTasksPlaceholder";
-            this.AllTasksPlaceholder.Size = new System.Drawing.Size(1100, 776);
-            this.AllTasksPlaceholder.TabIndex = 1;
-            // 
             // Window
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1100, 930);
             this.Controls.Add(this.beginMessageControl);
-            this.Controls.Add(this.flowLayoutPanel1);
+            this.Controls.Add(this.saveLoadControl);
             this.Margin = new System.Windows.Forms.Padding(0);
             this.Name = "Window";
             this.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
             this.Text = "Task Stack";
-            this.flowLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -99,7 +77,7 @@ namespace Task_Stack.GUI
         private void newAllTreesControl()
         {
             this.allTreesControl = new AllTreesControl();
-            this.flowLayoutPanel1.SuspendLayout();
+            this.SuspendLayout();
             
             // Set properties
             this.allTreesControl.BackColor = System.Drawing.Color.Transparent;
@@ -111,21 +89,14 @@ namespace Task_Stack.GUI
             this.allTreesControl.Margin = new System.Windows.Forms.Padding(0);
             
             // Add to layout at specific location
-            this.flowLayoutPanel1.Controls.Add(this.allTreesControl);
-            this.flowLayoutPanel1.Controls.SetChildIndex(
-                this.allTreesControl,
-                this.flowLayoutPanel1.Controls.GetChildIndex(this.AllTasksPlaceholder)
-                );
-            this.flowLayoutPanel1.Controls.Remove(this.AllTasksPlaceholder);
+            this.Controls.Add(this.allTreesControl);
 
-            this.flowLayoutPanel1.ResumeLayout(false);
+            this.ResumeLayout(false);
             this.PerformLayout();
         }
 
         private System.Windows.Forms.Label beginMessageControl;
         private AllTreesControl allTreesControl;
         private SaveLoadControl saveLoadControl;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.Panel AllTasksPlaceholder;
     }
 }
