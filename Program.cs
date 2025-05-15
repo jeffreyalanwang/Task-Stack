@@ -11,7 +11,8 @@ namespace Task_Stack
 
     internal static class Program
     {
-        internal static IConfiguration Config;
+        //internal static IConfiguration Config;
+        internal static Dictionary<string, string> Config;
 
         /// <summary>
         /// The main entry point for the application.
@@ -19,9 +20,13 @@ namespace Task_Stack
         [STAThread]
         static void Main()
         {
-            Config = new ConfigurationBuilder()
-                            .AddJsonFile("appsettings.json")
-                            .Build();
+            // Remove appsettings.json dependency
+            //Config = new ConfigurationBuilder()
+            //                .AddJsonFile("appsettings.json")
+            //                .Build();
+            Config = new Dictionary<string, string>(){ 
+                { "AppVersion", "0.0.1" }
+            };
             
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             Application.EnableVisualStyles();
