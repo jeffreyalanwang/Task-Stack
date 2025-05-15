@@ -25,7 +25,7 @@ namespace Task_Stack
             //                .AddJsonFile("appsettings.json")
             //                .Build();
             Config = new Dictionary<string, string>(){ 
-                { "AppVersion", "0.0.1" }
+                { "AppVersion", "0.0.2" }
             };
             
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);

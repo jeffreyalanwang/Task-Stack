@@ -19,6 +19,7 @@ namespace Task_Stack.GUI
         public AllTreesControl()
         {
             InitializeComponent();
+            this.tabControl.Size = this.Size + new Size(0, -130); // different resolutions keep anchoring to wrong dimensions otherwise
         }
         
         // Call this immediately after constructor.
