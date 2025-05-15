@@ -117,6 +117,8 @@ namespace Task_Stack.GUI
             childControl.InitializeToState(child_state);
             // Add the new TaskControl
             this.Nodes.Add(childControl);
+            // If new child is not done but we are, we are no longer done
+            this.TaskDone = this._state.Done; // no need to duplicate what has already been done
             // In the UI, make sure this node is expanded
             this.Expand();
         }

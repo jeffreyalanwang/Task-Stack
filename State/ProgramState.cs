@@ -582,6 +582,10 @@ namespace Task_Stack.State
         public void AddChild(Task childTask, bool notifyChangeListeners = true)
         {
             childTask._parent = this; // do not use .Parent, as this would call TriggerDataChange() again.
+            if (this._done && !childTask._done)
+            {
+                this.Done = false; // Propogate to ancestors as well
+            }
             this._children.Add(childTask);
             childTask.OnDataChange(this.TriggerDataChange);
             if (notifyChangeListeners) this.TriggerDataChange();
