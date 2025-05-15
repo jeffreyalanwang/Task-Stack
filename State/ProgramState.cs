@@ -8,6 +8,7 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace Task_Stack.State
 {
@@ -186,13 +187,16 @@ namespace Task_Stack.State
                                     : QualifyPath(filepath);
             try
             {
-                ReadFileAsString(filepath_str);
+                string fileContents = ReadFileAsString(filepath_str);
+                Debug.WriteLine($"Is load file available? From filepath {filepath}, successfully read these contents: {fileContents}");
+                if (fileContents == String.Empty) return false;
             }
             catch (Exception e) when (  e is DirectoryNotFoundException ||
                                         e is FileNotFoundException      ||
                                         e is IsolatedStorageException   ||
                                         e is IOException                    )
             {
+                Debug.WriteLine($"Is load file available? Failed to read filepath {filepath}");
                 return false;
             }
 
@@ -204,11 +208,14 @@ namespace Task_Stack.State
         private static readonly string defaultFileName = "taskstack_data.json";
         private static string GenerateDefaultSaveFilePath()
         {
-            using (IsolatedStorageFile fileStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Domain | IsolatedStorageScope.Assembly, null, null))
-            {
-                // Create in the root of the fileStore.
-                fileStore.CreateFile(defaultFileName);
-            }
+            // Create in the root of the fileStore.
+            withFileStore_safe(
+                (IsolatedStorageFile fileStore) =>
+                {
+                    if (!fileStore.FileExists(defaultFileName))
+                        fileStore.CreateFile(defaultFileName);
+                }
+                );
             return "###" + defaultFileName; // ### indicates that we are using IsolatedStorageFile, not a path
         }
         private static string QualifyPath(Uri relativePath)
@@ -252,6 +259,26 @@ namespace Task_Stack.State
                 }
             }
             else File.WriteAllText(absolutePath, str);
+        }
+        private static void withFileStore_safe(Action<IsolatedStorageFile> action)
+        {
+            using (IsolatedStorageFile fileStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Domain | IsolatedStorageScope.Assembly, null, null))
+            {
+                try
+                {
+                    action.Invoke(fileStore);
+                }
+                catch (IsolatedStorageException e)
+                {
+                    MessageBox.Show(
+                        text: "Error accessing default application file store." + ' ' +
+                                "Try reopening the application, or restarting your computer." +
+                                Environment.NewLine +
+                                "Error text: " + e.ToString()
+                    );
+                    throw;
+                }
+            }
         }
         #endregion Private helper methods
     }

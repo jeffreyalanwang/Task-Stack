@@ -1,4 +1,5 @@
 ﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,7 +15,7 @@ namespace Task_Stack.GUI
     public partial class Window : Form
     {
         private ProgramState _globalData = null;
-        
+
         public Window()
         {
             InitializeComponent();

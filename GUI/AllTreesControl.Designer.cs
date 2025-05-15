@@ -152,8 +152,6 @@ namespace Task_Stack.GUI
             taskTreeControl.InitializeToState(tree, setTabName); // Give taskTreeControl its contents
             taskTreeControl.ResumeLayout(false);
 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.defaultTabPage.Location = new System.Drawing.Point(8, 8);
             tabPage.Margin = new System.Windows.Forms.Padding(3);
             tabPage.Padding = new System.Windows.Forms.Padding(3, 3, 3, 9);

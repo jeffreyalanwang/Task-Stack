@@ -117,6 +117,8 @@ namespace Task_Stack.GUI
             childControl.InitializeToState(child_state);
             // Add the new TaskControl
             this.Nodes.Add(childControl);
+            // In the UI, make sure this node is expanded
+            this.Expand();
         }
 
         // Add a child with filler values.

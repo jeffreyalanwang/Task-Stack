@@ -188,7 +188,7 @@ namespace Task_Stack.State
             firstRawString = firstRawString.Replace("\\\"", "\"");
 
             string remainingString = str.Substring(1 + closingQuoteIndex);
-            return (firstRawString: firstRawString, remainingString: firstRawString);
+            return (firstRawString: firstRawString, remainingString: remainingString);
         }
 
         [Serializable]
